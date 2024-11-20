@@ -1,0 +1,19 @@
+{
+  "instance_msr_public_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "3.86.225.194"
+  },
+  "instance_wrks_public_ip": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string"
+      ]
+    ],
+    "value": [
+      "3.92.233.86"
+    ]
+  }
+}

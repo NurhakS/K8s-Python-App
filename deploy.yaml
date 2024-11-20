@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+  labels:
+    app: python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+      - name: python-app
+        image: nurhaks/python-app:v1
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            memory: "128Mi"  # Request 128 MiB of memory
+            cpu: "250m"      # Request 250 milliCPU (0.25 CPU)
+          limits:
+            memory: "256Mi"  # Limit to 256 MiB of memory
+            cpu: "500m"      # Limit to 500 milliCPU (0.5 CPU)

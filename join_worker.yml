@@ -1,0 +1,52 @@
+- name: Fetch and Set Kubeadm Join Command on Master
+  hosts: master
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Get kubeadm join command
+      command: /usr/bin/kubeadm token create --print-join-command
+      register: kubeadm_join_command
+
+    - name: Set kubeadm join command fact
+      set_fact:
+        kubeadm_join_command_fact: "{{ kubeadm_join_command.stdout }}"
+
+- name: Join Worker Nodes to Kubernetes Cluster
+  hosts: worker_nodes
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Check if node is already in the cluster
+      command: kubectl get nodes --no-headers
+      register: cluster_nodes
+      delegate_to: "{{ groups['master'][0] }}"
+      changed_when: false
+      failed_when: false
+
+    - name: Debug cluster nodes output
+      debug:
+        msg: "Cluster nodes: {{ cluster_nodes.stdout | default('No output from kubectl get nodes') }}"
+
+    - name: Extract node hostname
+      command: hostname
+      register: node_hostname
+      changed_when: false
+
+    - name: Debug node hostname
+      debug:
+        msg: "Node hostname: {{ node_hostname.stdout | default('No hostname detected') }}"
+    - name: Debug cluster nodes output
+      debug:
+        msg: "Cluster nodes: {{ cluster_nodes.stdout | default('No output from kubectl get nodes') }}"
+
+    - name: Debug node hostname
+      debug:
+       msg: "Node hostname: {{ node_hostname.stdout | default('No hostname detected') }}"
+
+    - name: Join worker node to cluster if not already joined
+      command: "{{ hostvars[groups['master'][0]]['kubeadm_join_command_fact'] }} --ignore-preflight-errors=FileAvailable--etc-kubernetes-kubelet.conf,FileAvailable--etc-kubernetes-pki-ca.crt,Port-10250"
+      when: node_hostname.stdout | default('') not in cluster_nodes.stdout | default('')
+      ignore_errors: no
+ 
