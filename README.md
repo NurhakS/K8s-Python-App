@@ -142,4 +142,4 @@ Feel free to explore the repository and provide feedback!
 
 ## Contact
 
-If you have any questions or suggestions, please feel free to reach out via [LinkedIn](https://www.linkedin.com/in/your-profile) or email at your-email@example.com.
+If you have any questions or suggestions, please feel free to reach out via [LinkedIn]([https://www.linkedin.com/in/your-profile](https://www.linkedin.com/in/nurhaksozer/)) or email at nicksozer@gmail.com.
