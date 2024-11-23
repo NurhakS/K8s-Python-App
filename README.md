@@ -143,6 +143,178 @@ Feel free to explore the repository and provide feedback!
 
 ---
 
+ Works With Jenkins Pipeline First One Triggers Second after Success 
+ pipeline {
+    agent any
+
+    environment {
+        // Set environment variables if needed
+        TF_VAR_aws_access_key = 'AKIAVRUVPY6ULII53M3A' // AWS access key
+        TF_VAR_aws_secret_key = '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'      // AWS secret key
+    }
+
+    stages {
+        stage('Terraform Init') {
+            steps {
+                dir('/mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S') {
+                    sh 'terraform init'
+                }
+                
+            }
+        }
+        stage('Terraform Plan') {
+            steps {
+                dir('/mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S') {
+                    sh ''' terraform plan \
+                       -var="access_key=AKIAVRUVPY6ULII53M3A" \
+                       -var="secret_key=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"
+                    '''
+                }
+                
+            }
+        }
+         
+        stage('Terraform Apply') {
+            steps {
+                dir('/mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S') {
+                    sh ''' terraform apply -auto-approve \
+                       -var="access_key=AKIAVRUVPY6ULII53M3A" \
+                       -var="secret_key=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"
+                       
+                    '''
+                }
+            }
+        }
+
+        stage('Generate Terraform Outputs') {
+            steps {
+                script {
+                    // Export Terraform outputs to JSON
+                    dir('/mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S'){
+                    sh 'terraform output -json > terraform_outputs.json'
+                
+                    }
+                }
+            }
+        }
+
+        stage('Generate Inventory ') {
+            steps {
+                script {
+                    // Generate Ansible Inventory from Terraform output
+                    dir('/mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S'){
+                    sh 'python3 terraform_inventory.py'
+                    }
+                }
+            }
+        }
+        stage('Get Admin Conf  ') {
+            steps {
+                script {
+                    // Generate Ansible Inventory from Terraform output
+                    dir('/mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S'){
+                    sh 'export ANSIBLE_HOST_KEY_CHECKING=False && ansible-playbook -i inventory.ini admin.yml'
+                    }
+                }
+            }
+        }
+        stage('Join Worker Nodes to Kubernetes') {
+            steps {
+                script {
+                    // Run Ansible to join worker nodes to Kubernetes
+                    sleep(time: 300, unit: 'SECONDS')
+                    dir('/mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S'){
+                    sh 'export ANSIBLE_HOST_KEY_CHECKING=False && ansible-playbook -i inventory.ini join_worker.yml'
+                    }
+                }
+            }
+        }
+
+        
+    }
+
+}
+
+Second Jenkins Deployment 
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'us-east-1'
+        ECR_REPO = '381491857320.dkr.ecr.us-east-1.amazonaws.com/k8s-app-repo'
+        KUBE_CONFIG = 'E:/Downloads/aws-challenge/Terraform-Bulding-K8S/admin.conf'  // Update with your path to kubeconfig
+    }
+
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build Docker image from your local Dockerfile
+                    sh 'docker build -t k8s-app:latest /mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S/docker'
+                }
+            }
+        }
+
+        stage('Push to ECR') {
+            steps {
+                script {
+                    // Login to ECR and push the Docker image
+                    sh '''
+                    # Get login password for ECR and login
+                    aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 381491857320.dkr.ecr.us-east-1.amazonaws.com
+                    
+                    # Tag the built image for ECR
+                    docker tag k8s-app:latest $ECR_REPO:latest
+                    
+                    # Push the image to ECR
+                    docker push $ECR_REPO:latest
+                    '''
+                }
+            }
+        }
+
+        
+
+        stage('Create MySQL Secret to Kubernetes') {
+            steps {
+                script {
+                    // Apply the Kubernetes deployment using the kubeconfig
+                    dir('/mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S') {
+                    sh '''
+                    kubectl --kubeconfig=admin.conf apply -f mysql-deployment.yaml
+                    '''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Apply the Kubernetes deployment using the kubeconfig
+                    dir('/mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S') {
+                    sh '''
+                    kubectl --kubeconfig=admin.conf apply -f deploy.yaml
+                    '''
+                    }
+                }
+            }
+        }
+
+        stage('Expose Ports to Kubernetes') {
+            steps {
+                script {
+                    // Apply the Kubernetes deployment using the kubeconfig
+                    dir('/mnt/e/Downloads/aws-challenge/Terraform-Bulding-K8S') {
+                    sh '''
+                    kubectl --kubeconfig=admin.conf apply -f service.yaml
+                    '''
+                    }
+                }
+            }
+        }
+    }
+}
 ## Contact
 
 If you have any questions or suggestions, please feel free to reach out via [LinkedIn](https://www.linkedin.com/in/nurhaksozer)or email at nicksozer@gmail.com.
