@@ -1,0 +1,18 @@
+- hosts: master
+  tasks:
+    - name: Copy admin.conf to home folder
+      command: cp /etc/kubernetes/admin.conf /home/{{ ansible_user }}/admin.conf
+      become: true
+
+    - name: Adjust permissions for admin.conf
+      command: chmod 644 /home/{{ ansible_user }}/admin.conf
+      become: true
+    - name: Adjust permissions for admin.conf
+      command: sudo chown ubuntu:ubuntu /home/ubuntu/admin.conf
+
+      become: true
+    - name: Download admin.conf to local machine
+      fetch:
+        src: /home/{{ ansible_user }}/admin.conf
+        dest: "{{ playbook_dir }}/admin.conf"
+        flat: yes

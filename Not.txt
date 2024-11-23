@@ -1,0 +1,10 @@
+kubectl create secret docker-registry ecr-secret \
+  --docker-server=730335329688.dkr.ecr.us-east-1.amazonaws.com \
+  --docker-username=AWS \
+  --docker-password=$(aws ecr get-login-password --region us-east-1) \
+  --docker-email=your-email@example.com
+Because secret didnt created you have create yourself via ssh to master node.
+
+
+kubectl expose deployment python-app --type=NodePort --name=python-app-service --port=5000
+Exposing port 

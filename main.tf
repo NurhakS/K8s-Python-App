@@ -12,6 +12,13 @@ resource "aws_vpc" "some_custom_vpc" {
     Name = "K8S VPC"
   }
 }
+resource "aws_ecr_repository" "k8s_repo" {
+  name = "k8s-app-repo"
+
+  tags = {
+    Name = "K8S Repository"
+  }
+}
 
 resource "random_shuffle" "az" {
   input        = ["${var.region}a", "${var.region}b", "${var.region}c", "${var.region}d", "${var.region}e"]
@@ -121,6 +128,7 @@ resource "aws_instance" "ec2_instance_msr" {
     key_name = var.ami_key_pair_name
     associate_public_ip_address = true
     vpc_security_group_ids = [ aws_security_group.k8s_sg.id ]
+    iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
     root_block_device {
     volume_type = "gp2"
     volume_size = "16"
@@ -147,6 +155,7 @@ resource "aws_instance" "ec2_instance_wrk" {
     key_name = var.ami_key_pair_name
     associate_public_ip_address = true
     vpc_security_group_ids = [ aws_security_group.k8s_sg.id ]
+    iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
     root_block_device {
     volume_type = "gp2"
     volume_size = "16"

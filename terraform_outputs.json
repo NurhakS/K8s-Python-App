@@ -1,8 +1,18 @@
 {
+  "ec2_instance_profile_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ec2-k8s-instance-profile"
+  },
+  "ec2_role_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ec2-k8s-role"
+  },
   "instance_msr_public_ip": {
     "sensitive": false,
     "type": "string",
-    "value": "3.86.225.194"
+    "value": "100.26.222.248"
   },
   "instance_wrks_public_ip": {
     "sensitive": false,
@@ -13,7 +23,7 @@
       ]
     ],
     "value": [
-      "3.92.233.86"
+      "35.174.208.252"
     ]
   }
 }

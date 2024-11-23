@@ -1,10 +1,10 @@
 variable "access_key" { #Todo: uncomment the default value and add your access key.
-        description = "nope"
+        description = "AKIAVRUVPY6ULII53M3A"
         #default = "XXXXXXXXXXXXXX" 
 }
 
 variable "secret_key" {  #Todo: uncomment the default value and add your secert key.
-        description = "nope"
+        description = "TyO2iJDgbBjApEwsFcvkqohM/JUX85E+cVWJt/UP"
         # default = "XXXXXXXXXXXXXXXXXXXXXXXXX" 
 }
 
