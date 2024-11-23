@@ -138,6 +138,9 @@ This project demonstrates a combination of DevOps and cloud engineering expertis
 
 Feel free to explore the repository and provide feedback!
 
+![Screenshot 2024-11-23 134632](https://github.com/user-attachments/assets/135248dc-c48b-404b-8773-88d35cd0070d)
+![Screenshot 2024-11-23 171025](https://github.com/user-attachments/assets/b18e1f80-dd03-497a-abcc-b4ca5c860e75)
+
 ---
 
 ## Contact
