@@ -14,15 +14,28 @@ spec:
       labels:
         app: python-app
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
       - name: python-app
-        image: nurhaks/python-app:v1
+        image: 381491857320.dkr.ecr.us-east-1.amazonaws.com/k8s-app-repo:latest
         ports:
-        - containerPort: 5000
+        - containerPort: 3000
+        env:
+          - name: MYSQL_USERNAME
+            value: "root"  # Set this to your MySQL username
+          - name: MYSQL_PASSWORD
+            value: "rootpassword"  # Set this to your MySQL password
+          - name: MYSQL_INSTANCE_NAME
+            value: "mydb"  # Set this to your MySQL database name
+          - name: MYSQL_PORT_3306_TCP_ADDR
+            value: "db"  # Set this to the hostname or service name of MySQL
+          - name: MYSQL_PORT_3306_TCP_PORT
+            value: "3306"  # Ensure this matches the port your MySQL service is using
         resources:
           requests:
-            memory: "128Mi"  # Request 128 MiB of memory
-            cpu: "250m"      # Request 250 milliCPU (0.25 CPU)
+            memory: "1Gi"
+            cpu: "500m"
           limits:
-            memory: "256Mi"  # Limit to 256 MiB of memory
-            cpu: "500m"      # Limit to 500 milliCPU (0.5 CPU)
+            memory: "4Gi"
+            cpu: "1000m"
